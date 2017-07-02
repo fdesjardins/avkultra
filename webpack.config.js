@@ -6,9 +6,10 @@ module.exports = {
   entry: resolve('client/index.jsx'),
   output: {
     path: resolve('dist'),
-    filename: 'bundle.js'
+    filename: 'bundle.js',
+    sourcePrefix: ''
   },
-  devtool: 'cheap-module-source-map',
+  // devtool: 'cheap-module-source-map',
   resolve: {
     modules: ['node_modules'],
     extensions: ['*', '.json', '.jsx', '.js'],
@@ -35,6 +36,7 @@ module.exports = {
           'sass-loader'
         ]
       }
-    ]
+    ],
+    unknownContextCritical: false
   }
 }

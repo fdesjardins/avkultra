@@ -1,30 +1,43 @@
+import Baobab from 'baobab'
 import Inferno from 'inferno'
 
-import 'app/index.scss'
-import tree from 'app/state'
-import Globe from 'components/Globe.jsx'
-import Baobab from 'baobab'
+import Globe from 'components/Globe'
 
-const initialState = new Baobab({
+import 'app/index.scss'
+
+const tree = new Baobab({
   meta: {
     name: 'avkultra'
   },
   globe: {
     message: 'hello',
     name: 'wendy'
-  }
+  },
+  count: 1
 })
 
-const app = props => (
-  <div>
-    <h1>props:</h1>
-    {/* <Globe props={ props.globe } /> */}
-  </div>
-)
-
-const initialize = (tree, App) => {
-  tree.on('update', () => Inferno.render(<App props={ tree }/>, document.querySelector('#app')))
-  Inferno.render(<App props={ tree }/>, document.querySelector('#app'))
+const incrementCount = () => {
+  tree.set('count', tree.get('count') + 1)
 }
 
-initialize(tree, app)
+const StateViewer = ({ state }) => (
+  <pre className='props'>{ JSON.stringify(state, null, 2) }</pre>
+)
+
+const App = ({ tree }) => {
+  return (
+    <div>
+      <StateViewer state={ tree } />
+      <button onClick={ incrementCount }>incrementCount</button>
+      <Globe tree={ tree } />
+    </div>
+  )
+}
+
+const initialize = (tree, App) => {
+  const render = () => Inferno.render(<App tree={ tree }/>, document.querySelector('#app'))
+  tree.on('update', render)
+  render()
+}
+
+initialize(tree, App)

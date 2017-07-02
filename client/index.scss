@@ -1,3 +1,15 @@
 body {
-  background: white
+  background: white;
+}
+
+.props {
+  background: #ddd;
+  padding: 10px;
+  border: 1px solid #b6b6b6;
+  border-radius: 3px;
+}
+
+.cesium-container {
+  width: 600px;
+  height: 600px;
 }
