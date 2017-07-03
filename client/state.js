@@ -13,7 +13,8 @@ const state = new Baobab({
     aircraftReports: [],
     stations: [],
     sites: [],
-    navaids: []
+    navaids: [],
+    notams: []
   }
 })
 
@@ -31,5 +32,8 @@ apiFetch('/sites')
 
 apiFetch('/navaids')
   .then(navaids => state.select('globe', 'navaids').set(navaids))
+
+apiFetch('/notams')
+  .then(notams => state.select('globe', 'notams').set(notams))
 
 export default state
