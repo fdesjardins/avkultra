@@ -2,7 +2,7 @@ import Inferno from 'inferno'
 
 import 'cesium/Source/Widgets/widgets.css'
 import BuildModuleUrl from 'cesium/Source/Core/buildModuleUrl'
-BuildModuleUrl.setBaseUrl('./cesium/Source')
+BuildModuleUrl.setBaseUrl('./Cesium')
 import Viewer from 'cesium/Source/Widgets/Viewer/Viewer'
 
 import utils from '-/utils'
