@@ -4,7 +4,7 @@ import 'cesium/Source/Widgets/widgets.css'
 import BuildModuleUrl from 'cesium/Source/Core/buildModuleUrl'
 BuildModuleUrl.setBaseUrl('./cesium')
 import Viewer from 'cesium/Source/Widgets/Viewer/Viewer'
-
+import BingMapsImageryProvider from 'cesium/Source/Scene/BingMapsImageryProvider'
 import utils from '-/utils'
 
 import './Globe.scss'
@@ -21,11 +21,15 @@ let cesiumViewerOptions = {
   timeline: false,
   navigationHelpButton: false,
   navigationInstructionsInitiallyVisible: false,
-  automaticallyTrackDataSourceClocks: false
+  automaticallyTrackDataSourceClocks: false,
+  imageryProvider: new BingMapsImageryProvider({
+    url : 'https://dev.virtualearth.net',
+    key : ''
+  })
 }
 
 const didMount = () => {
-  new Viewer('cesium-container')
+  new Viewer('cesium-container', cesiumViewerOptions)
 }
 
 const Globe = ({ message, name, incrementCount }) => {
