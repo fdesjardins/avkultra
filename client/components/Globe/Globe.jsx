@@ -6,6 +6,7 @@ BuildModuleUrl.setBaseUrl('./cesium')
 import Viewer from 'cesium/Source/Widgets/Viewer/Viewer'
 import BingMapsImageryProvider from 'cesium/Source/Scene/BingMapsImageryProvider'
 import utils from '-/utils'
+import { bingMapsApiKey } from '../../../config/config'
 
 import './Globe.scss'
 
@@ -24,7 +25,7 @@ let cesiumViewerOptions = {
   automaticallyTrackDataSourceClocks: false,
   imageryProvider: new BingMapsImageryProvider({
     url : 'https://dev.virtualearth.net',
-    key : ''
+    key : bingMapsApiKey
   })
 }
 
