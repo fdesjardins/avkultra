@@ -31,7 +31,7 @@ let cesiumViewerOptions = {
   // sceneModePicker: false,
   // selectionIndicator: false,
   timeline: false,
-  navigationHelpButton: false,
+  navigationHelpButton: true,
   navigationInstructionsInitiallyVisible: false,
   automaticallyTrackDataSourceClocks: false
 }
