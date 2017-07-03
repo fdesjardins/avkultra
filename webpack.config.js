@@ -16,7 +16,8 @@ module.exports = {
     alias: {
       app: resolve('client'),
       assets: resolve('client/assets'),
-      components: resolve('client/components')
+      components: resolve('client/components'),
+      utils: resolve('client/utils')
     }
   },
   module: {
@@ -35,8 +36,23 @@ module.exports = {
           'css-loader',
           'sass-loader'
         ]
+      },
+      {
+        test: /\.css$/,
+        loaders: [
+          'style-loader',
+          'css-loader'
+        ]
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        loaders: [
+          'file-loader?hash=sha512&digest=hex&name=[hash].[ext]',
+          'image-webpack-loader?bypassOnDebug'
+        ]
       }
     ],
-    unknownContextCritical: false
+    unknownContextCritical: false,
+    unknownContextRegExp: /^.\/.*$/
   }
 }
