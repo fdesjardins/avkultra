@@ -121,7 +121,9 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
         position: Cartesian3.fromDegrees(parseFloat(station.longitude), parseFloat(station.latitude)),
         point : {
           color : Color.BLUE,
-          pixelSize : 7,
+          outlineColor: Color.WHITE,
+          outlineWidth: 1,
+          pixelSize : 5,
           heightReference: HeightReference.CLAMP_TO_GROUND
         }
       })
@@ -148,10 +150,10 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
         name: `${navaid.name} (${navaid.navaid}) NAVAID`,
         position: Cartesian3.fromDegrees(parseFloat(navaid.longitude), parseFloat(navaid.latitude)),
         point : {
-          color : Color.BLACK,
-          outlineColor: Color.WHITE,
+          color : Color.GRAY,
+          outlineColor: Color.BLACK,
           outlineWidth: 1,
-          pixelSize : 5,
+          pixelSize : 3,
           heightReference: HeightReference.CLAMP_TO_GROUND
         }
       })
