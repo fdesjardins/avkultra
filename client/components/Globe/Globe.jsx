@@ -10,6 +10,7 @@ import LabelGraphics from 'cesium/Source/DataSources/LabelGraphics'
 import RectangleGraphics from 'cesium/Source/DataSources/RectangleGraphics'
 import Color from 'cesium/Source/Core/Color'
 import BingMapsImageryProvider from 'cesium/Source/Scene/BingMapsImageryProvider'
+import NearFarScalar from 'cesium/Source/Core/NearFarScalar'
 import ArcGisMapServerImageryProvider from 'cesium/Source/Scene/ArcGisMapServerImageryProvider'
 import UrlTemplateImageryProvider from 'cesium/Source/Scene/UrlTemplateImageryProvider'
 import HeightReference from 'cesium/Source/Scene/HeightReference'
@@ -93,7 +94,7 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
   airportsCursor.on('update', () => {
     airportsCursor.get().map(airport => {
       viewer.entities.add({
-        name: airport.facilityName,
+        name: `${airport.facilityName} (${airport.icaoIdentifier}) Airport`,
         description: jsonMarkup(airport, jsonCss),
         label: new LabelGraphics({
           text: airport.icaoIdentifier,
@@ -139,11 +140,12 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
         description: jsonMarkup(station, jsonCss),
         position: Cartesian3.fromDegrees(parseFloat(station.longitude), parseFloat(station.latitude)),
         point : {
-          color : Color.BLUE,
+          color : Color.BLACK.withAlpha(0.8),
           outlineColor: Color.WHITE,
           outlineWidth: 1,
           pixelSize : 5,
-          heightReference: HeightReference.CLAMP_TO_GROUND
+          heightReference: HeightReference.CLAMP_TO_GROUND,
+          translucencyByDistance: new NearFarScalar(1.5e2, 1.0, 9.0e6, 0.0)
         }
       })
     })
@@ -171,12 +173,21 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
         description: jsonMarkup(navaid, jsonCss),
         position: Cartesian3.fromDegrees(parseFloat(navaid.longitude), parseFloat(navaid.latitude)),
         point : {
-          color : Color.GRAY,
-          outlineColor: Color.BLACK,
-          outlineWidth: 1,
-          pixelSize : 3,
-          heightReference: HeightReference.CLAMP_TO_GROUND
-        }
+          color: Color.TRANSPARENT,
+          outlineColor: Color.BLUE,
+          outlineWidth: 1.5,
+          pixelSize: 4,
+          shadows: true,
+          heightReference: HeightReference.CLAMP_TO_GROUND,
+          translucencyByDistance: new NearFarScalar(1.5e2, 1.0, 5.0e6, 0.0)
+        },
+        label: new LabelGraphics({
+          text: navaid.navaid,
+          font: '11px Arial',
+          fillColor: Color.WHITE,
+          pixelOffset: new Cartesian2(22, 15),
+          translucencyByDistance: new NearFarScalar(1.5e2, 1.0, 4.0e6, 0.0)
+        })
       })
     })
   })
