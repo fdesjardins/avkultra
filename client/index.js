@@ -5,8 +5,8 @@ import App from 'components/App/App'
 
 let initialState
 
-const incrementCount = (amount = 1) => () => {
-  initialState.set('count', initialState.get('count') + amount)
+const incrementCount = countCursor => (amount = 1) => () => {
+  countCursor.set(countCursor.get() + amount)
 }
 
 initialState = new Baobab({
@@ -16,10 +16,12 @@ initialState = new Baobab({
   globe: {
     hello: 'hello',
     name: 'wendy',
-    incrementCount
-  },
-  count: 1
+    count: 1
+  }
 })
+initialState
+  .select('globe')
+  .set('incrementCount', incrementCount(initialState.select('globe', 'count')))
 
 const initialize = (tree, App) => {
   const render = () => Inferno.render(<App tree={ tree }/>, document.querySelector('#app'))
