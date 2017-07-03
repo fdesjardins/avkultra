@@ -113,14 +113,17 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
     aircraftReportsCursor.get().map(aircraftReport => {
       viewer.entities.add({
         description: jsonMarkup(aircraftReport.parsed, jsonCss),
-        position : Cartesian3.fromDegrees(parseFloat(aircraftReport.longitude), parseFloat(aircraftReport.latitude)),
+        position : Cartesian3.fromDegrees(
+          parseFloat(aircraftReport.longitude),
+          parseFloat(aircraftReport.latitude),
+          parseFloat(aircraftReport.altitudeFtMsl * 0.3048)
+        ),
         box: {
-          dimensions : new Cartesian3(15000.0, 15000.0, 5000.0),
+          dimensions : new Cartesian3(15000.0, 15000.0, 7500.0),
           material : mapPirepIntensityToColor(aircraftReport.parsed.severity).withAlpha(0.6),
           outline : true,
-          outlineColor : Color.BLACK,
-          outlineWidth : 2,
-          heightReference: HeightReference.CLAMP_TO_GROUND
+          outlineColor : Color.WHITE,
+          outlineWidth : 2
         }
       })
     })
