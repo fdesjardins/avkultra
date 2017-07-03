@@ -13,6 +13,7 @@ import BingMapsImageryProvider from 'cesium/Source/Scene/BingMapsImageryProvider
 import ArcGisMapServerImageryProvider from 'cesium/Source/Scene/ArcGisMapServerImageryProvider'
 import UrlTemplateImageryProvider from 'cesium/Source/Scene/UrlTemplateImageryProvider'
 import HeightReference from 'cesium/Source/Scene/HeightReference'
+import BingMapsApi from 'cesium/Source/Core/BingMapsApi'
 import utils from '-/utils'
 import { bingMapsApiKey } from '../../../config/config'
 import jsonMarkup from 'json-markup'
@@ -60,6 +61,8 @@ const jsonCss = css2json(`
   }
 `)
 
+BingMapsApi.defaultKey = 'AjQ2juL12NOTWeKSzNyYRY-fXpsH9aosgaIlbL0oVDjo2QhMLawAKqPQKui7A20K'
+
 const mapPirepIntensityToColor = intensity => {
   if (intensity > 7) {
     return Color.RED
@@ -91,6 +94,7 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
     airportsCursor.get().map(airport => {
       viewer.entities.add({
         name: airport.facilityName,
+        description: jsonMarkup(airport, jsonCss),
         label: new LabelGraphics({
           text: airport.icaoIdentifier,
           font: '12px Arial',
@@ -132,6 +136,7 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
     stationsCursor.get().map(station => {
       viewer.entities.add({
         name: `${station.stationName} Station`,
+        description: jsonMarkup(station, jsonCss),
         position: Cartesian3.fromDegrees(parseFloat(station.longitude), parseFloat(station.latitude)),
         point : {
           color : Color.BLUE,
@@ -147,6 +152,7 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
     sitesCursor.get().map(site => {
       viewer.entities.add({
         name: `${site.siteName} Camera Site`,
+        description: jsonMarkup(site, jsonCss),
         position: Cartesian3.fromDegrees(parseFloat(site.longitude), parseFloat(site.latitude)),
         point : {
           color : Color.GREEN,
@@ -162,6 +168,7 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
     navaidsCursor.get().map(navaid => {
       viewer.entities.add({
         name: `${navaid.name} (${navaid.navaid}) NAVAID`,
+        description: jsonMarkup(navaid, jsonCss),
         position: Cartesian3.fromDegrees(parseFloat(navaid.longitude), parseFloat(navaid.latitude)),
         point : {
           color : Color.GRAY,
