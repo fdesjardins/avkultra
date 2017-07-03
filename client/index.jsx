@@ -5,20 +5,23 @@ import Globe from 'components/Globe'
 
 import 'app/index.scss'
 
-const tree = new Baobab({
-  meta: {
-    name: 'avkultra'
-  },
-  globe: {
-    message: 'hello',
-    name: 'wendy'
-  },
-  count: 1
-})
+let tree
 
 const incrementCount = () => {
   tree.set('count', tree.get('count') + 1)
 }
+
+tree = new Baobab({
+  meta: {
+    name: 'avkultra'
+  },
+  globe: {
+    hello: 'hello',
+    name: 'wendy',
+    incrementCount
+  },
+  count: 1
+})
 
 const StateViewer = ({ state }) => (
   <pre className='props'>{ JSON.stringify(state, null, 2) }</pre>
@@ -28,8 +31,7 @@ const App = ({ tree }) => {
   return (
     <div>
       <StateViewer state={ tree } />
-      <button onClick={ incrementCount }>incrementCount</button>
-      <Globe tree={ tree } />
+      <Globe tree={ tree.select('globe') } />
     </div>
   )
 }

@@ -26,13 +26,20 @@ const mount = () => {
   new CesiumViewer(document.querySelector('.cesium-container'), cesiumViewerOptions)
 }
 
-const Globe = props => (
-  <div>
-    <span>hola!</span>
-    <div className='cesium-container'></div>
-  </div>
-)
+const Globe = ({ props }) => {
+  console.log(props)
+  return (
+    <div>
+      <span>{ props.get('hello') } { props.get('name') }</span>
+      <button onClick={ props.get('incrementCount') }>incrementCount</button>
+      <div className='cesium-container'></div>
+    </div>
+  )
+}
 
-export default (props) => (
-  <Globe props={ props} onComponentDidMount={ mount } />
-)
+export default ({ tree }) => {
+  console.log(tree)
+  return (
+    <Globe props={ tree } onComponentDidMount={ mount } />
+  )
+}
