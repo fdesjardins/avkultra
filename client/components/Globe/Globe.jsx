@@ -4,7 +4,9 @@ import 'cesium/Source/Widgets/widgets.css'
 import BuildModuleUrl from 'cesium/Source/Core/buildModuleUrl'
 BuildModuleUrl.setBaseUrl('./cesium')
 import Viewer from 'cesium/Source/Widgets/Viewer/Viewer'
+import Cartesian2 from 'cesium/Source/Core/Cartesian2'
 import Cartesian3 from 'cesium/Source/Core/Cartesian3'
+import LabelGraphics from 'cesium/Source/DataSources/LabelGraphics'
 import Color from 'cesium/Source/Core/Color'
 import BingMapsImageryProvider from 'cesium/Source/Scene/BingMapsImageryProvider'
 import utils from '-/utils'
@@ -70,10 +72,15 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
     airportsCursor.get().map(airport => {
       viewer.entities.add({
         name: airport.facilityName,
+        label: new LabelGraphics({
+          text: airport.icaoIdentifier,
+          font: '10px Arial',
+          pixelOffset: new Cartesian2(20, 12)
+        }),
         position : Cartesian3.fromDegrees(parseFloat(airport.longitude), parseFloat(airport.latitude)),
         point : {
           color : Color.WHITE,
-          pixelSize : 16
+          pixelSize : 13
         }
       })
     })
@@ -102,7 +109,6 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
         }
       })
     })
-    // console.log('mount', airportsCursor.get())
   })
   sitesCursor.on('update', () => {
     sitesCursor.get().map(site => {
