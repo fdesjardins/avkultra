@@ -2,9 +2,8 @@ import Inferno from 'inferno'
 import BuildModuleUrl from 'cesium/Source/Core/buildModuleUrl'
 BuildModuleUrl.setBaseUrl('./')
 import CesiumViewer from 'cesium/Source/Widgets/Viewer/Viewer'
-import { addColor } from '../actions/actions'
 
-// BuildModuleUrl.setBaseUrl('./')
+import './Globe.scss'
 
 let cesiumViewerOptions = {
   animation: false,
@@ -22,24 +21,29 @@ let cesiumViewerOptions = {
 }
 
 const mount = () => {
-  console.log('mount')
   new CesiumViewer(document.querySelector('.cesium-container'), cesiumViewerOptions)
 }
 
-const Globe = ({ props }) => {
-  console.log(props)
+const shouldUpdate = (lastProps, nextProps) => JSON.stringify(lastProps) !== JSON.stringify(nextProps)
+
+const Globe = ({ message, name, incrementCount }) => {
   return (
     <div>
-      <span>{ props.get('hello') } { props.get('name') }</span>
-      <button onClick={ props.get('incrementCount') }>incrementCount</button>
+      <span>{ message } { name }</span>
+      <button onClick={ incrementCount(2) }>incrementCount</button>
       <div className='cesium-container'></div>
     </div>
   )
 }
 
 export default ({ tree }) => {
-  console.log(tree)
   return (
-    <Globe props={ tree } onComponentDidMount={ mount } />
+    <Globe
+      message={ tree.get('hello') }
+      name={ tree.get('name') }
+      incrementCount={ tree.get('incrementCount') }
+      onComponentShouldUpdate={ shouldUpdate }
+      onComponentDidMount={ mount }
+    />
   )
 }
