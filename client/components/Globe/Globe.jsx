@@ -60,7 +60,18 @@ const jsonCss = css2json(`
   }
 `)
 
-// const fetchCameraImage = cameraId =>
+const mapPirepIntensityToColor = intensity => {
+  if (intensity > 7) {
+    return Color.RED
+  }
+  if (intensity > 5) {
+    return Color.ORANGE
+  }
+  if (intensity > 1) {
+    return Color.GREEN
+  }
+  return Color.BLUE
+}
 
 const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCursor, navaidsCursor) => () => {
   const viewer = new Viewer('cesium-container', cesiumViewerOptions)
@@ -105,7 +116,7 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
         position : Cartesian3.fromDegrees(parseFloat(aircraftReport.longitude), parseFloat(aircraftReport.latitude)),
         box: {
           dimensions : new Cartesian3(15000.0, 15000.0, 5000.0),
-          material : Color.RED.withAlpha(0.6),
+          material : mapPirepIntensityToColor(aircraftReport.parsed.severity).withAlpha(0.6),
           outline : true,
           outlineColor : Color.BLACK,
           outlineWidth : 2,
