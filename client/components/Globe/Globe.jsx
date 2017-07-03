@@ -7,6 +7,7 @@ import Viewer from 'cesium/Source/Widgets/Viewer/Viewer'
 import Cartesian2 from 'cesium/Source/Core/Cartesian2'
 import Cartesian3 from 'cesium/Source/Core/Cartesian3'
 import LabelGraphics from 'cesium/Source/DataSources/LabelGraphics'
+import RectangleGraphics from 'cesium/Source/DataSources/RectangleGraphics'
 import Color from 'cesium/Source/Core/Color'
 import BingMapsImageryProvider from 'cesium/Source/Scene/BingMapsImageryProvider'
 import utils from '-/utils'
@@ -60,6 +61,8 @@ const jsonCss = css2json(`
   }
 `)
 
+// const fetchCameraImage = cameraId =>
+
 const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCursor) => () => {
   const viewer = new Viewer('cesium-container', cesiumViewerOptions)
   const cesiumTerrainProviderMeshes = new CesiumTerrainProvider({
@@ -74,13 +77,17 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
         name: airport.facilityName,
         label: new LabelGraphics({
           text: airport.icaoIdentifier,
-          font: '10px Arial',
-          pixelOffset: new Cartesian2(20, 12)
+          font: '12px Arial',
+          fillColor: Color.WHITE,
+          pixelOffset: new Cartesian2(22, 15)
         }),
-        position : Cartesian3.fromDegrees(parseFloat(airport.longitude), parseFloat(airport.latitude)),
-        point : {
-          color : Color.WHITE,
-          pixelSize : 13
+        position: Cartesian3.fromDegrees(parseFloat(airport.longitude), parseFloat(airport.latitude)),
+        point: {
+          color: Color.TRANSPARENT,
+          outlineColor: Color.WHITE,
+          outlineWidth: 1.5,
+          pixelSize: 12,
+          shadows: true
         }
       })
     })
@@ -90,13 +97,15 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
       viewer.entities.add({
         description: jsonMarkup(aircraftReport.parsed, jsonCss),
         position : Cartesian3.fromDegrees(parseFloat(aircraftReport.longitude), parseFloat(aircraftReport.latitude)),
-        point : {
-          color : Color.RED,
-          pixelSize : 10
+        point: {
+          color: Color.WHITE,
+          outlineColor: Color.BLACK,
+          outlineWidth: 1.5,
+          pixelSize: 8,
+          shadows: true
         }
       })
     })
-    // console.log('mount', airportsCursor.get())
   })
   stationsCursor.on('update', () => {
     stationsCursor.get().map(station => {
@@ -117,7 +126,9 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
         position: Cartesian3.fromDegrees(parseFloat(site.longitude), parseFloat(site.latitude)),
         point : {
           color : Color.GREEN,
-          pixelSize : 10
+          outlineColor: Color.WHITE,
+          outlineWidth: 2,
+          pixelSize : 8
         }
       })
     })

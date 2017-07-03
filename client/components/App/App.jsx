@@ -6,10 +6,7 @@ import Globe from '-/components/Globe/Globe'
 import './App.scss'
 
 const App = ({ tree }) => (
-  <div>
-    <StateViewer state={ tree } />
-    <Globe tree={ tree.select('globe') } />
-  </div>
+  <Globe tree={ tree.select('globe') } />
 )
 
 export default App

@@ -13,6 +13,7 @@
     "node": ">=7"
   },
   "scripts": {
+    "start": "webpack && nodemon server/server.js -w server",
     "test": "eslint *.js && nyc ./node_modules/.bin/mocha --opts mocha.opts test.js"
   },
   "files": [
