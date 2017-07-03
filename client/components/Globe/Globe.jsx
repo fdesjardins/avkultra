@@ -10,6 +10,7 @@ import LabelGraphics from 'cesium/Source/DataSources/LabelGraphics'
 import RectangleGraphics from 'cesium/Source/DataSources/RectangleGraphics'
 import Color from 'cesium/Source/Core/Color'
 import BingMapsImageryProvider from 'cesium/Source/Scene/BingMapsImageryProvider'
+import HeightReference from 'cesium/Source/Scene/HeightReference'
 import utils from '-/utils'
 import { bingMapsApiKey } from '../../../config/config'
 import jsonMarkup from 'json-markup'
@@ -66,10 +67,10 @@ const jsonCss = css2json(`
 const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCursor) => () => {
   const viewer = new Viewer('cesium-container', cesiumViewerOptions)
   const cesiumTerrainProviderMeshes = new CesiumTerrainProvider({
-    url : 'https://assets.agi.com/stk-terrain/v1/tilesets/world/tiles',
-    requestWaterMask : true,
-    requestVertexNormals : true
-  });
+    url: 'https://assets.agi.com/stk-terrain/v1/tilesets/world/tiles',
+    requestWaterMask: true,
+    requestVertexNormals: true
+  })
   viewer.terrainProvider = cesiumTerrainProviderMeshes
   airportsCursor.on('update', () => {
     airportsCursor.get().map(airport => {
@@ -87,7 +88,8 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
           outlineColor: Color.WHITE,
           outlineWidth: 1.5,
           pixelSize: 12,
-          shadows: true
+          shadows: true,
+          heightReference: HeightReference.CLAMP_TO_GROUND
         }
       })
     })
@@ -102,7 +104,8 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
           outlineColor: Color.BLACK,
           outlineWidth: 1.5,
           pixelSize: 8,
-          shadows: true
+          shadows: true,
+          heightReference: HeightReference.CLAMP_TO_GROUND
         }
       })
     })
@@ -114,7 +117,8 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
         position: Cartesian3.fromDegrees(parseFloat(station.longitude), parseFloat(station.latitude)),
         point : {
           color : Color.BLUE,
-          pixelSize : 7
+          pixelSize : 7,
+          heightReference: HeightReference.CLAMP_TO_GROUND
         }
       })
     })
@@ -128,7 +132,8 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
           color : Color.GREEN,
           outlineColor: Color.WHITE,
           outlineWidth: 2,
-          pixelSize : 8
+          pixelSize : 8,
+          heightReference: HeightReference.CLAMP_TO_GROUND
         }
       })
     })
