@@ -2,7 +2,7 @@ import Baobab from 'baobab'
 import superagent from 'superagent'
 
 import { incrementCount } from '-/actions/actions'
-import { apiFetch } from '-/utils'
+import { apiFetch, flightAwareFetch } from '-/utils'
 
 const state = new Baobab({
   meta: {
@@ -14,7 +14,8 @@ const state = new Baobab({
     stations: [],
     sites: [],
     navaids: [],
-    notams: []
+    notams: [],
+    planes: []
   }
 })
 
@@ -35,5 +36,10 @@ apiFetch('/navaids')
 
 apiFetch('/notams')
   .then(notams => state.select('globe', 'notams').set(notams))
+
+flightAwareFetch('/Metars', { airport: 'LAX' })
+  .then(metars => {
+    console.log(metars)
+  })
 
 export default state

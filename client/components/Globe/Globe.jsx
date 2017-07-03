@@ -22,6 +22,7 @@ import css2json from 'css2json'
 import CesiumTerrainProvider from 'cesium/Source/Core/CesiumTerrainProvider'
 
 import './Globe.scss'
+import '-/assets/sr71.png'
 
 let cesiumViewerOptions = {
   animation: false,
@@ -121,7 +122,7 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
         position : Cartesian3.fromDegrees(
           parseFloat(aircraftReport.longitude),
           parseFloat(aircraftReport.latitude),
-          parseFloat(aircraftReport.altitudeFtMsl * 0.3048)
+          parseFloat(aircraftReport.altitudeFtMsl * 0.3048 + (7500 * 0.3048))
         ),
         box: {
           dimensions : new Cartesian3(15000.0, 15000.0, 7500.0),
