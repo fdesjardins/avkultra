@@ -13,7 +13,7 @@
     "node": ">=7"
   },
   "scripts": {
-    "start": "webpack && nodemon server/server.js -w server",
+    "start": "nodemon server/server.js -w server",
     "test": "eslint *.js && nyc ./node_modules/.bin/mocha --opts mocha.opts test.js"
   },
   "files": [
@@ -31,6 +31,7 @@
     "lodash": "^4.17.4",
     "stream": "0.0.2",
     "superagent": "^3.5.2",
+    "url": "^0.11.0",
     "webpack": "^3.0.0"
   },
   "devDependencies": {

@@ -2,6 +2,7 @@ import Baobab from 'baobab'
 import superagent from 'superagent'
 
 import { incrementCount } from '-/actions/actions'
+import { apiFetch } from '-/utils'
 
 const state = new Baobab({
   meta: {
@@ -11,36 +12,24 @@ const state = new Baobab({
     airports: [],
     aircraftReports: [],
     stations: [],
-    sites: []
+    sites: [],
+    navaids: []
   }
 })
 
-superagent.get('http://104.197.102.53:34110/airports')
-  .then(results => results.body.payload)
-  .then(airports => {
-    state.select('globe', 'airports').set(airports)
-  })
-  .catch(err => console.error(err))
+apiFetch('/airports')
+  .then(airports => state.select('globe', 'airports').set(airports))
 
-superagent.get('http://104.197.102.53:34110/aircraft-reports/pireps')
-  .then(results => results.body.payload)
-  .then(aircraftReports => {
-    state.select('globe', 'aircraftReports').set(aircraftReports)
-  })
-  .catch(err => console.error(err))
+apiFetch('/aircraft-reports/pireps')
+  .then(pireps => state.select('globe', 'aircraftReports').set(pireps))
 
-superagent.get('http://104.197.102.53:34110/stations?bounds=0,-180|90,1')
-  .then(results => results.body.payload)
-  .then(stations => {
-    state.select('globe', 'stations').set(stations)
-  })
-  .catch(err => console.error(err))
+apiFetch('/stations?bounds=0,-180|90,1')
+  .then(stations => state.select('globe', 'stations').set(stations))
 
-superagent.get('http://104.197.102.53:34110/sites')
-  .then(results => results.body.payload)
-  .then(sites => {
-    state.select('globe', 'sites').set(sites)
-  })
-  .catch(err => console.error(err))
+apiFetch('/sites')
+  .then(sites => state.select('globe', 'sites').set(sites))
+
+apiFetch('/navaids')
+  .then(navaids => state.select('globe', 'navaids').set(navaids))
 
 export default state

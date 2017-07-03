@@ -6,3 +6,5 @@ coverage/
 
 dist/
 config/secrets.json
+
+deploy.sh
