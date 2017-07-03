@@ -1,7 +1,20 @@
 import Baobab from 'baobab'
 
-const tree = new Baobab({
-  colors: ['yellow', 'blue', 'orange']
+import { incrementCount } from '-/actions/actions'
+
+const initialState = new Baobab({
+  meta: {
+    name: 'avkultra'
+  },
+  globe: {
+    hello: 'hello',
+    name: 'wendy',
+    count: 1
+  }
 })
 
-export default tree
+initialState
+  .select('globe')
+  .set('incrementCount', incrementCount(initialState.select('globe', 'count')))
+
+export default initialState

@@ -34,11 +34,7 @@ const didMount = () => {
 
 const Globe = ({ message, name, incrementCount }) => {
   return (
-    <div>
-      <span>{ message } { name }</span>
-      <button onClick={ incrementCount(2) }>incrementCount</button>
-      <div id='cesium-container' className='cesium-container'></div>
-    </div>
+    <div id='cesium-container' className='cesium-container'></div>
   )
 }
 
