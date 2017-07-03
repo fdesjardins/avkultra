@@ -14,10 +14,7 @@ module.exports = {
     modules: ['node_modules'],
     extensions: ['*', '.json', '.jsx', '.js'],
     alias: {
-      app: resolve('client'),
-      assets: resolve('client/assets'),
-      components: resolve('client/components'),
-      utils: resolve('client/utils')
+      '-': resolve('client')
     }
   },
   module: {

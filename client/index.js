@@ -1,15 +1,10 @@
 import Baobab from 'baobab'
 import Inferno from 'inferno'
 
-import App from 'components/App/App'
+import App from '-/components/App/App'
+import { incrementCount } from '-/actions/actions'
 
-let initialState
-
-const incrementCount = countCursor => (amount = 1) => () => {
-  countCursor.set(countCursor.get() + amount)
-}
-
-initialState = new Baobab({
+const initialState = new Baobab({
   meta: {
     name: 'avkultra'
   },
@@ -19,6 +14,7 @@ initialState = new Baobab({
     count: 1
   }
 })
+
 initialState
   .select('globe')
   .set('incrementCount', incrementCount(initialState.select('globe', 'count')))
