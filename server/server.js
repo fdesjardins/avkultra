@@ -2,9 +2,11 @@ const fs = require('fs')
 const path = require('path')
 const express = require('express')
 const livereload = require('livereload')
+const compression = require('compression')
 
 module.exports = async (config) => {
   const app = express()
+  app.use(compression())
   app.use(express.static(path.join(__dirname, '../dist')))
 
   const layout = (await fs.readFileSync(path.join(__dirname, 'layout.html'))).toString()

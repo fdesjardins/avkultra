@@ -1,4 +1,5 @@
 const path = require('path')
+const webpack = require('webpack')
 
 const resolve = d => path.join(__dirname, d)
 
@@ -51,5 +52,16 @@ module.exports = {
     ],
     unknownContextCritical: false,
     unknownContextRegExp: /^.\/.*$/
-  }
+  },
+  plugins: [
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false
+      },
+      output: {
+        comments: false
+      },
+      sourceMap: false
+    })
+  ]
 }
