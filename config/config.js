@@ -5,7 +5,9 @@ module.exports = {
     host: 'http://104.197.102.53:34110'
   },
   fxml: {
-    host: 'http://flightxml.flightaware.com/json/FlightXML2/'
+    host: `http://fdesjardins:${secrets.fxml.apiKey}@flightxml.flightaware.com/json/FlightXML2`,
+    username: secrets.fxml.username,
+    apiKey: secrets.fxml.apiKey
   },
   bingMapsApiKey: secrets.bingMapsApiKey
 }

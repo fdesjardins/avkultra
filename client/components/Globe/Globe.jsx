@@ -6,8 +6,12 @@ BuildModuleUrl.setBaseUrl('./cesium')
 import Viewer from 'cesium/Source/Widgets/Viewer/Viewer'
 import Cartesian2 from 'cesium/Source/Core/Cartesian2'
 import Cartesian3 from 'cesium/Source/Core/Cartesian3'
+import Transforms from 'cesium/Source/Core/Transforms'
+import Quaternion from 'cesium/Source/Core/Quaternion'
 import LabelGraphics from 'cesium/Source/DataSources/LabelGraphics'
+import BillboardGraphics from 'cesium/Source/DataSources/BillboardGraphics'
 import RectangleGraphics from 'cesium/Source/DataSources/RectangleGraphics'
+import ConstantProperty from 'cesium/Source/DataSources/ConstantProperty'
 import Color from 'cesium/Source/Core/Color'
 import BingMapsImageryProvider from 'cesium/Source/Scene/BingMapsImageryProvider'
 import NearFarScalar from 'cesium/Source/Core/NearFarScalar'
@@ -22,7 +26,7 @@ import css2json from 'css2json'
 import CesiumTerrainProvider from 'cesium/Source/Core/CesiumTerrainProvider'
 
 import './Globe.scss'
-import '-/assets/sr71.png'
+import sr71 from '-/assets/sr71.png'
 
 let cesiumViewerOptions = {
   animation: false,
@@ -78,7 +82,7 @@ const mapPirepIntensityToColor = intensity => {
   return Color.BLUE
 }
 
-const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCursor, navaidsCursor) => () => {
+const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCursor, navaidsCursor, aircraftCursor, airepsCursor) => () => {
   const viewer = new Viewer('cesium-container', cesiumViewerOptions)
   // viewer.scene.imageryLayers.addImageryProvider(new UrlTemplateImageryProvider({
   //   url : 'http://104.197.62.138/map-tiles/vfr/sectional?bbox={westDegrees},{southDegrees},{eastDegrees},{northDegrees}'
@@ -118,17 +122,36 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
   aircraftReportsCursor.on('update', () => {
     aircraftReportsCursor.get().map(aircraftReport => {
       viewer.entities.add({
-        description: jsonMarkup(aircraftReport.parsed, jsonCss),
+        description: jsonMarkup(aircraftReport, jsonCss),
         position : Cartesian3.fromDegrees(
           parseFloat(aircraftReport.longitude),
           parseFloat(aircraftReport.latitude),
-          parseFloat(aircraftReport.altitudeFtMsl * 0.3048 + (7500 * 0.3048))
+          Math.max(parseFloat(aircraftReport.altitudeFtMsl - (15000 / 2)), 0)
         ),
         box: {
-          dimensions : new Cartesian3(15000.0, 15000.0, 7500.0),
-          material : mapPirepIntensityToColor(aircraftReport.parsed.severity).withAlpha(0.6),
+          dimensions : new Cartesian3(25000.0, 25000.0, 15000.0),
+          material : mapPirepIntensityToColor(aircraftReport.parsed.severity).withAlpha(0.5),
           outline : true,
           outlineColor : Color.WHITE,
+          outlineWidth : 2
+        }
+      })
+    })
+  })
+  airepsCursor.on('update', () => {
+    airepsCursor.get().map(airep => {
+      viewer.entities.add({
+        description: jsonMarkup(airep, jsonCss),
+        position : Cartesian3.fromDegrees(
+          parseFloat(airep.longitude),
+          parseFloat(airep.latitude),
+          parseFloat(airep.altitudeFtMsl - (15000 / 2))
+        ),
+        box: {
+          dimensions : new Cartesian3(25000.0, 25000.0, 15000.0),
+          material : Color.WHITE.withAlpha(0.3),
+          outline : true,
+          outlineColor : Color.BLACK.withAlpha(0.3),
           outlineWidth : 2
         }
       })
@@ -180,14 +203,31 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
           pixelSize: 4,
           shadows: true,
           heightReference: HeightReference.CLAMP_TO_GROUND,
-          translucencyByDistance: new NearFarScalar(1.5e2, 1.0, 5.0e6, 0.0)
+          translucencyByDistance: new NearFarScalar(1.5e2, 1.0, 3.5e6, 0.0)
         },
         label: new LabelGraphics({
           text: navaid.navaid,
-          font: '11px Arial',
+          font: '12px Arial',
           fillColor: Color.WHITE,
           pixelOffset: new Cartesian2(22, 15),
-          translucencyByDistance: new NearFarScalar(1.5e2, 1.0, 4.0e6, 0.0)
+          translucencyByDistance: new NearFarScalar(1.5e2, 1.0, 5.0e6, 0.0)
+        })
+      })
+    })
+  })
+  aircraftCursor.on('update', e => {
+    const aircraftList = e.data.currentData
+    aircraftList.map(aircraft => {
+      viewer.entities.add({
+        name: `${aircraft.ident} (${aircraft.origin}-${aircraft.destination})`,
+        description: jsonMarkup(aircraft, jsonCss),
+        position: Cartesian3.fromDegrees(aircraft.lowLongitude, aircraft.lowLatitude, (aircraft.altitude || 200) * 100),
+        billboard: new BillboardGraphics({
+          image: sr71,
+          width: 12,
+          height: 12,
+          alignedAxis: Cartesian3.UNIT_Z,
+          rotation: -1 * (aircraft.heading) * 0.01748
         })
       })
     })
@@ -195,7 +235,6 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
 }
 
 const Globe = ({ message, name, incrementCount }) => {
-  console.log('render')
   return (
     <div id='cesium-container' className='cesium-container'></div>
   )
@@ -210,6 +249,8 @@ export default ({ tree }) => (
       tree.select('stations'),
       tree.select('sites'),
       tree.select('navaids'),
+      tree.select('aircraft'),
+      tree.select('aireps')
     ) }
   />
 )

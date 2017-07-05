@@ -1,5 +1,6 @@
 import Baobab from 'baobab'
 import superagent from 'superagent'
+import _ from 'lodash'
 
 import { incrementCount } from '-/actions/actions'
 import { apiFetch, flightAwareFetch } from '-/utils'
@@ -11,11 +12,12 @@ const state = new Baobab({
   globe: {
     airports: [],
     aircraftReports: [],
+    aireps: [],
     stations: [],
     sites: [],
     navaids: [],
     notams: [],
-    planes: []
+    aircraft: []
   }
 })
 
@@ -24,6 +26,18 @@ apiFetch('/airports')
 
 apiFetch('/aircraft-reports/pireps')
   .then(pireps => state.select('globe', 'aircraftReports').set(pireps))
+
+apiFetch('/aircraft-reports/aireps?bounds=0,-180|90,1')
+  .then(aireps => _.uniqBy(aireps, a => a.aircraftRef))
+  .then(aireps => {
+    state.select('globe', 'aireps').set(aireps)
+    aireps.map(airep => {
+      flightAwareFetch(airep.aircraftRef)
+        .then(aircraftInfo => {
+          state.select('globe', 'aircraft').push(aircraftInfo)
+        })
+    })
+  })
 
 apiFetch('/stations?bounds=0,-180|90,1')
   .then(stations => state.select('globe', 'stations').set(stations))
@@ -36,10 +50,5 @@ apiFetch('/navaids')
 
 apiFetch('/notams')
   .then(notams => state.select('globe', 'notams').set(notams))
-
-flightAwareFetch('/Metars', { airport: 'LAX' })
-  .then(metars => {
-    console.log(metars)
-  })
 
 export default state

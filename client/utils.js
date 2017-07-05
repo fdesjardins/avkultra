@@ -13,8 +13,8 @@ exports.apiFetch = route => {
     .catch(err => console.error(err))
 }
 
-exports.flightAwareFetch = route => {
-  return superagent.get(url.resolve(config.fxml.host, route))
-    .use(jsonp)
+exports.flightAwareFetch = aircraftId => {
+  return superagent.get(`http://138.68.50.91:1358/${aircraftId}`)
+    .then(response => response.body)
     .catch(err => console.error(err))
 }
