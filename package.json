@@ -33,6 +33,7 @@
     "inferno-router": "^3.6.4",
     "json-markup": "^1.1.0",
     "lodash": "^4.17.4",
+    "notams": "^1.1.8",
     "redis": "^2.7.1",
     "stream": "0.0.2",
     "superagent": "^3.5.2",

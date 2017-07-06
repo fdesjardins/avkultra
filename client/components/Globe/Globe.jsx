@@ -20,7 +20,7 @@ import UrlTemplateImageryProvider from 'cesium/Source/Scene/UrlTemplateImageryPr
 import HeightReference from 'cesium/Source/Scene/HeightReference'
 import BingMapsApi from 'cesium/Source/Core/BingMapsApi'
 import utils from '-/utils'
-import { bingMapsApiKey } from '../../../config/config'
+import { bingMapsApiKey } from '-/config'
 import jsonMarkup from 'json-markup'
 import css2json from 'css2json'
 import CesiumTerrainProvider from 'cesium/Source/Core/CesiumTerrainProvider'
@@ -82,7 +82,15 @@ const mapPirepIntensityToColor = intensity => {
   return Color.BLUE
 }
 
-const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCursor, navaidsCursor, aircraftCursor, airepsCursor) => () => {
+const didMount = (
+  airportsCursor,
+  aircraftReportsCursor,
+  stationsCursor,
+  sitesCursor,
+  navaidsCursor,
+  aircraftCursor,
+  airepsCursor,
+  notamsCursor) => () => {
   const viewer = new Viewer('cesium-container', cesiumViewerOptions)
   // viewer.scene.imageryLayers.addImageryProvider(new UrlTemplateImageryProvider({
   //   url : 'http://104.197.62.138/map-tiles/vfr/sectional?bbox={westDegrees},{southDegrees},{eastDegrees},{northDegrees}'
@@ -126,7 +134,7 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
         position : Cartesian3.fromDegrees(
           parseFloat(aircraftReport.longitude),
           parseFloat(aircraftReport.latitude),
-          Math.max(parseFloat(aircraftReport.altitudeFtMsl - (15000 / 2)), 0)
+          Math.max(parseFloat(aircraftReport.altitudeFtMsl - (15000 / 2)), 0) * 0.3048
         ),
         box: {
           dimensions : new Cartesian3(25000.0, 25000.0, 15000.0),
@@ -145,7 +153,7 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
         position : Cartesian3.fromDegrees(
           parseFloat(airep.longitude),
           parseFloat(airep.latitude),
-          parseFloat(airep.altitudeFtMsl - (15000 / 2))
+          parseFloat(airep.altitudeFtMsl - (15000 / 2)) * 0.3048
         ),
         box: {
           dimensions : new Cartesian3(25000.0, 25000.0, 15000.0),
@@ -203,14 +211,14 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
           pixelSize: 4,
           shadows: true,
           heightReference: HeightReference.CLAMP_TO_GROUND,
-          translucencyByDistance: new NearFarScalar(1.5e2, 1.0, 3.5e6, 0.0)
+          translucencyByDistance: new NearFarScalar(1.5e2, 1.0, 2.5e6, 0.0)
         },
         label: new LabelGraphics({
           text: navaid.navaid,
           font: '12px Arial',
           fillColor: Color.WHITE,
           pixelOffset: new Cartesian2(22, 15),
-          translucencyByDistance: new NearFarScalar(1.5e2, 1.0, 5.0e6, 0.0)
+          translucencyByDistance: new NearFarScalar(1.5e2, 1.0, 4.0e6, 0.0)
         })
       })
     })
@@ -221,7 +229,7 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
       viewer.entities.add({
         name: `${aircraft.ident} (${aircraft.origin}-${aircraft.destination})`,
         description: jsonMarkup(aircraft, jsonCss),
-        position: Cartesian3.fromDegrees(aircraft.lowLongitude, aircraft.lowLatitude, (aircraft.altitude || 200) * 100),
+        position: Cartesian3.fromDegrees(aircraft.lowLongitude, aircraft.lowLatitude, (aircraft.altitude || 200) * 100 * 0.3048),
         billboard: new BillboardGraphics({
           image: sr71,
           width: 12,
@@ -230,6 +238,36 @@ const didMount = (airportsCursor, aircraftReportsCursor, stationsCursor, sitesCu
           rotation: -1 * (aircraft.heading) * 0.01748
         })
       })
+    })
+  })
+  notamsCursor.on('update', e => {
+    const notamsList = e.data.currentData
+    notamsList.map(notam => {
+      if (notam.volumes !== null) {
+        if (!notam.volumes.center || !notam.volumes.center.latitude || !notam.volumes.center.longitude) {
+          return
+        }
+        // console.log(notam)
+        viewer.entities.add({
+          name: `notam`,
+          description: jsonMarkup(notam, jsonCss),
+          position: Cartesian3.fromDegrees(
+            parseFloat(notam.volumes.center.longitude),
+            parseFloat(notam.volumes.center.latitude),
+            parseFloat(notam.volumes.flightLevelBottomFt || 0) + (notam.volumes.heightFt || 60000) * 0.3048
+          ),
+          cylinder : {
+            material: Color.ORANGE.withAlpha(0.3),
+            outlineColor: Color.WHITE,
+            outlineWidth: 1,
+            outline: true,
+            length: (notam.volumes.heightFt || 60000) * 0.3048,
+            topRadius: notam.volumes.radiusNm * 6076.12 * 0.3048,
+            bottomRadius: notam.volumes.radiusNm * 6076.12 * 0.3048,
+            heightReference: HeightReference.CLAMP_TO_GROUND
+          }
+        })
+      }
     })
   })
 }
@@ -250,7 +288,8 @@ export default ({ tree }) => (
       tree.select('sites'),
       tree.select('navaids'),
       tree.select('aircraft'),
-      tree.select('aireps')
+      tree.select('aireps'),
+      tree.select('notams')
     ) }
   />
 )

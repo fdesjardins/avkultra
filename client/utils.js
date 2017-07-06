@@ -14,7 +14,13 @@ exports.apiFetch = route => {
 }
 
 exports.flightAwareFetch = aircraftId => {
-  return superagent.get(`http://138.68.50.91:1358/${aircraftId}`)
+  return superagent.get(`${config.proxyApi.host}/${aircraftId}`)
+    .then(response => response.body)
+    .catch(err => console.error(err))
+}
+
+exports.notamsFetch = () => {
+  return superagent.get(`${config.avkuApi.host}/notams`)
     .then(response => response.body)
     .catch(err => console.error(err))
 }

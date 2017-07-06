@@ -3,7 +3,7 @@ import superagent from 'superagent'
 import _ from 'lodash'
 
 import { incrementCount } from '-/actions/actions'
-import { apiFetch, flightAwareFetch } from '-/utils'
+import { apiFetch, flightAwareFetch, notamsFetch } from '-/utils'
 
 const state = new Baobab({
   meta: {
@@ -48,7 +48,7 @@ apiFetch('/sites')
 apiFetch('/navaids')
   .then(navaids => state.select('globe', 'navaids').set(navaids))
 
-apiFetch('/notams')
+notamsFetch('kzdv')
   .then(notams => state.select('globe', 'notams').set(notams))
 
 export default state
