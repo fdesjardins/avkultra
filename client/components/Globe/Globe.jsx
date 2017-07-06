@@ -232,8 +232,8 @@ const didMount = (
         position: Cartesian3.fromDegrees(aircraft.lowLongitude, aircraft.lowLatitude, (aircraft.altitude || 200) * 100 * 0.3048),
         billboard: new BillboardGraphics({
           image: sr71,
-          width: 12,
-          height: 12,
+          width: 8,
+          height: 8,
           alignedAxis: Cartesian3.UNIT_Z,
           rotation: -1 * (aircraft.heading) * 0.01748
         })

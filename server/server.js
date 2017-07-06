@@ -41,7 +41,8 @@ module.exports = async (config) => {
       'KZSE',
       'KZDC',
       'KHZU',
-      'KZMA'
+      'KZMA',
+      'PANC'
     ]).then(results => res.json(results))
   })
 
