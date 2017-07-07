@@ -4,7 +4,7 @@ const baseConfig = require('./base')
 
 exports.local = _.merge({}, baseConfig, {
   api: {
-    host: 'http://104.197.102.53:34110'
+    host: 'http://104.198.183.44/v2'
   },
   avkuApi: {
     host: 'http://localhost:1357'
@@ -16,7 +16,7 @@ exports.local = _.merge({}, baseConfig, {
 
 exports.production = _.merge({}, baseConfig, {
   api: {
-    host: 'http://104.197.102.53:34110'
+    host: 'http://104.198.183.44/v2'
   },
   avkuApi: {
     host: 'http://138.68.50.91:1357'

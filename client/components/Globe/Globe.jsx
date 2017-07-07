@@ -118,13 +118,14 @@ const didMount = (
   airportsCursor.on('update', () => {
     airportsCursor.get().map(airport => {
       viewer.entities.add({
-        name: `${airport.facilityName} (${airport.icaoIdentifier}) Airport`,
+        name: `${airport.icaoAirportName} (${airport.icaoIdentifier}) Airport`,
         description: jsonMarkup(airport, jsonCss),
         label: new LabelGraphics({
-          text: airport.icaoIdentifier,
+          text: airport.icao,
           font: '12px Arial',
           fillColor: Color.WHITE,
-          pixelOffset: new Cartesian2(22, 15)
+          pixelOffset: new Cartesian2(22, 15),
+          translucencyByDistance: new NearFarScalar(airport.visibility * 4.3e4, 1.0, airport.visibility * 4.6e4, 0.0)
         }),
         position: Cartesian3.fromDegrees(parseFloat(airport.longitude), parseFloat(airport.latitude)),
         point: {
@@ -133,7 +134,8 @@ const didMount = (
           outlineWidth: 1.5,
           pixelSize: 12,
           shadows: true,
-          heightReference: HeightReference.CLAMP_TO_GROUND
+          heightReference: HeightReference.CLAMP_TO_GROUND,
+          translucencyByDistance: new NearFarScalar(airport.visibility * 4.3e4, 1.0, airport.visibility * 4.6e4, 0.0)
         }
       })
     })
@@ -189,7 +191,14 @@ const didMount = (
           pixelSize : 5,
           heightReference: HeightReference.CLAMP_TO_GROUND,
           translucencyByDistance: new NearFarScalar(1.5e2, 1.0, 9.0e6, 0.0)
-        }
+        },
+        label: new LabelGraphics({
+          text: station.stationId,
+          font: '12px Arial',
+          fillColor: Color.WHITE,
+          pixelOffset: new Cartesian2(22, 15),
+          translucencyByDistance: new NearFarScalar(1.5e2, 1.0, 5.0e6, 0.0)
+        }),
       })
     })
   })

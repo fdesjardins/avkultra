@@ -8,7 +8,7 @@ exports.shouldUpdate = (lastProps, nextProps) => {
 }
 
 exports.apiFetch = route => {
-  return superagent.get(url.resolve(config.api.host, route))
+  return superagent.get(`${config.api.host}${route}`)
     .then(results => results.body.payload)
     .catch(err => console.error(err))
 }

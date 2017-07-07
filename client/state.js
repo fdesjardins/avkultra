@@ -21,8 +21,34 @@ const state = new Baobab({
   }
 })
 
-apiFetch('/airports')
-  .then(airports => state.select('globe', 'airports').set(airports))
+const locationRequests = _.range(13).map(i => `/locations?bounds=0,-${i * 15}|90,-${i * 15 - 15}`)
+Promise.all(locationRequests.map(lr => apiFetch(lr)))
+  .then(results => [].concat(...results))
+  .then(locations => {
+    // console.log(locations)
+    if (locations && locations.length > 0) {
+      return _.flatten(locations.map(a => {
+        if (a && a.data && a.data.length > 0) {
+          let visibility = 1
+          if (a.display && a.display.length > 0) {
+            // console.log(a.display)
+            const lowest = a.display.find(d => d.markerStyle === 'FULL')
+            if (lowest && lowest.level) {
+              visibility = 13 - lowest.level
+            }
+          }
+          return a.data.map(d => {
+            if (d.type === 'airport') {
+              return _.merge({}, d, { visibility: Math.pow(visibility, 3.5) })
+            }
+          })
+        }
+      })).filter(x => !!x)
+    }
+  })
+  .then(airports => {
+    state.select('globe', 'airports').set(airports)
+  })
 
 apiFetch('/aircraft-reports/pireps')
   .then(pireps => state.select('globe', 'aircraftReports').set(pireps))
