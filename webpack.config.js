@@ -48,20 +48,17 @@ module.exports = {
           'file-loader?hash=sha512&digest=hex&name=[hash].[ext]',
           'image-webpack-loader?bypassOnDebug'
         ]
+      },
+      {
+        test: /\.(gltf|glb)$/i,
+        loaders: [
+          'file-loader?hash=sha512&digest=hex&name=[hash].[ext]'
+        ]
       }
     ],
     unknownContextCritical: false,
     unknownContextRegExp: /^.\/.*$/
   },
   plugins: [
-    // new webpack.optimize.UglifyJsPlugin({
-    //   compress: {
-    //     warnings: false
-    //   },
-    //   output: {
-    //     comments: false
-    //   },
-    //   sourceMap: true
-    // })
   ]
 }

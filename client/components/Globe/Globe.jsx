@@ -1,32 +1,42 @@
 import Inferno from 'inferno'
 
-import 'cesium/Source/Widgets/widgets.css'
 import BuildModuleUrl from 'cesium/Source/Core/buildModuleUrl'
 BuildModuleUrl.setBaseUrl('./cesium')
-import Viewer from 'cesium/Source/Widgets/Viewer/Viewer'
+
+import jsonMarkup from 'json-markup'
+import css2json from 'css2json'
+
 import Cartesian2 from 'cesium/Source/Core/Cartesian2'
 import Cartesian3 from 'cesium/Source/Core/Cartesian3'
+import Color from 'cesium/Source/Core/Color'
 import Transforms from 'cesium/Source/Core/Transforms'
 import Quaternion from 'cesium/Source/Core/Quaternion'
+import HeadingPitchRoll from 'cesium/Source/Core/HeadingPitchRoll'
+import NearFarScalar from 'cesium/Source/Core/NearFarScalar'
+import BingMapsApi from 'cesium/Source/Core/BingMapsApi'
+import CesiumTerrainProvider from 'cesium/Source/Core/CesiumTerrainProvider'
+
 import LabelGraphics from 'cesium/Source/DataSources/LabelGraphics'
 import BillboardGraphics from 'cesium/Source/DataSources/BillboardGraphics'
 import RectangleGraphics from 'cesium/Source/DataSources/RectangleGraphics'
+import ModelGraphics from 'cesium/Source/DataSources/ModelGraphics'
 import ConstantProperty from 'cesium/Source/DataSources/ConstantProperty'
-import Color from 'cesium/Source/Core/Color'
+
+import Viewer from 'cesium/Source/Widgets/Viewer/Viewer'
+import 'cesium/Source/Widgets/widgets.css'
+
+import HeightReference from 'cesium/Source/Scene/HeightReference'
+import LabelStyle from 'cesium/Source/Scene/LabelStyle'
 import BingMapsImageryProvider from 'cesium/Source/Scene/BingMapsImageryProvider'
-import NearFarScalar from 'cesium/Source/Core/NearFarScalar'
 import ArcGisMapServerImageryProvider from 'cesium/Source/Scene/ArcGisMapServerImageryProvider'
 import UrlTemplateImageryProvider from 'cesium/Source/Scene/UrlTemplateImageryProvider'
-import HeightReference from 'cesium/Source/Scene/HeightReference'
-import BingMapsApi from 'cesium/Source/Core/BingMapsApi'
+
 import utils from '-/utils'
 import { bingMapsApiKey } from '-/config'
-import jsonMarkup from 'json-markup'
-import css2json from 'css2json'
-import CesiumTerrainProvider from 'cesium/Source/Core/CesiumTerrainProvider'
 
 import './Globe.scss'
 import sr71 from '-/assets/sr71.png'
+import b739 from '-/assets/B739.gltf'
 
 let cesiumViewerOptions = {
   animation: false,
@@ -34,6 +44,7 @@ let cesiumViewerOptions = {
   fullscreenButton: false,
   geocoder: false,
   homeButton: false,
+  shadows : true,
   // infoBox: false,
   // sceneModePicker: false,
   // selectionIndicator: false,
@@ -134,10 +145,10 @@ const didMount = (
         position : Cartesian3.fromDegrees(
           parseFloat(aircraftReport.longitude),
           parseFloat(aircraftReport.latitude),
-          Math.max(parseFloat(aircraftReport.altitudeFtMsl - (15000 / 2)), 0) * 0.3048
+          Math.max(parseFloat(aircraftReport.altitudeFtMsl - (7500 / 2)), 0) * 0.3048
         ),
         box: {
-          dimensions : new Cartesian3(25000.0, 25000.0, 15000.0),
+          dimensions : new Cartesian3(15000.0, 15000.0, 7500.0),
           material : mapPirepIntensityToColor(aircraftReport.parsed.severity).withAlpha(0.5),
           outline : true,
           outlineColor : Color.WHITE,
@@ -153,10 +164,10 @@ const didMount = (
         position : Cartesian3.fromDegrees(
           parseFloat(airep.longitude),
           parseFloat(airep.latitude),
-          parseFloat(airep.altitudeFtMsl - (15000 / 2)) * 0.3048
+          parseFloat(airep.altitudeFtMsl - (7500 / 2)) * 0.3048
         ),
         box: {
-          dimensions : new Cartesian3(25000.0, 25000.0, 15000.0),
+          dimensions : new Cartesian3(15000.0, 15000.0, 7500.0),
           material : Color.WHITE.withAlpha(0.3),
           outline : true,
           outlineColor : Color.BLACK.withAlpha(0.3),
@@ -223,22 +234,51 @@ const didMount = (
       })
     })
   })
+  const aircraftEntities = []
   aircraftCursor.on('update', e => {
     const aircraftList = e.data.currentData
+    if (aircraftEntities.length > 0) {
+      aircraftList.map(aircraft => {
+        const ac = aircraftEntities.find(a => a.name === `${aircraft.ident} (${aircraft.origin}-${aircraft.destination})`)
+        if (ac) {
+          ac.position = Cartesian3.fromDegrees(aircraft.lowLongitude, aircraft.lowLatitude, (aircraft.altitude || 200) * 100 * 0.3048)
+        }
+      })
+      return
+    }
     aircraftList.map(aircraft => {
-      viewer.entities.add({
+      const position = Cartesian3.fromDegrees(aircraft.lowLongitude, aircraft.lowLatitude, (aircraft.altitude || 200) * 100 * 0.3048)
+      aircraftEntities.push(viewer.entities.add({
         name: `${aircraft.ident} (${aircraft.origin}-${aircraft.destination})`,
         description: jsonMarkup(aircraft, jsonCss),
-        position: Cartesian3.fromDegrees(aircraft.lowLongitude, aircraft.lowLatitude, (aircraft.altitude || 200) * 100 * 0.3048),
-        billboard: new BillboardGraphics({
-          image: sr71,
-          width: 8,
-          height: 8,
-          alignedAxis: Cartesian3.UNIT_Z,
-          rotation: -1 * (aircraft.heading) * 0.01748
+        position,
+        orientation: Transforms.headingPitchRollQuaternion(position, new HeadingPitchRoll(aircraft.heading * 0.01748, -0, 0)),
+        model: new ModelGraphics({
+          uri: b739,
+          minimumPixelSize: 24,
+          color: Color.WHITE,
+          scale: 100
+          // maximumScale: 200
+        }),
+        label: new LabelGraphics({
+          text: `${aircraft.ident} (${aircraft.origin}-${aircraft.destination})`,
+          font: '16px Arial',
+          fillColor: Color.WHITE,
+          style: LabelStyle.FILL_AND_OUTLINE,
+          pixelOffset: new Cartesian2(0, 25),
+          translucencyByDistance: new NearFarScalar(1.5e2, 1.0, 1.0e6, 0.0)
         })
-      })
+        // billboard: new BillboardGraphics({
+        //   image: sr71,
+        //   width: 8,
+        //   height: 8,
+        //   alignedAxis: Cartesian3.UNIT_Z,
+        //   rotation: -1 * (aircraft.heading) * 0.01748
+        // })
+      }))
+      // viewer.trackedEntity = aircraftEntities[aircraftEntities.length]
     })
+    // viewer.trackedEntity = aircraftEntities[0]
   })
   notamsCursor.on('update', e => {
     const notamsList = e.data.currentData

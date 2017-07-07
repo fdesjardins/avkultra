@@ -50,7 +50,7 @@ module.exports = async (config) => {
   console.log('listening on 1357...')
 
   const livereloadServer = livereload.createServer({
-    delay: 0
+    delay: 100
   })
   livereloadServer.watch(path.join(__dirname, '../dist'))
 
