@@ -13,8 +13,10 @@ exports.apiFetch = route => {
     .catch(err => console.error(err))
 }
 
-exports.flightAwareFetch = aircraftId => {
-  return superagent.get(`${config.proxyApi.host}/${aircraftId}`)
+exports.flightAwareFetch = aircraftIds => {
+  return superagent.post(`${config.proxyApi.host}/aircraft`)
+    .set('Content-Type', 'application/json')
+    .send({ aircraft: aircraftIds })
     .then(response => response.body)
     .catch(err => console.error(err))
 }

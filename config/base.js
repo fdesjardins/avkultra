@@ -9,7 +9,7 @@ config.environments = Object.freeze({
   production: 'production'
 })
 
-config.environment = config.environments[process.env.NODE_ENV] || config.environments.production
+config.environment = config.environments[process.env.NODE_ENV || 'local']
 
 module.exports = _.merge({}, config, {
   fxml: {

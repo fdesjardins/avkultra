@@ -22,6 +22,7 @@
   "keywords": [],
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^1.17.2",
     "catbox": "^7.1.4",
     "catbox-redis": "^3.0.1",
     "cesium": "^1.35.1",
@@ -45,6 +46,7 @@
     "babel-core": "^6.25.0",
     "babel-loader": "^7.1.1",
     "babel-plugin-inferno": "^3.2.0",
+    "babel-preset-babili": "^0.1.4",
     "babel-preset-env": "^1.6.0",
     "baobab": "^2.4.3",
     "chai": "^4.0.2",

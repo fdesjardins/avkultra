@@ -21,9 +21,11 @@ const state = new Baobab({
   }
 })
 
-const fetchLocations = () => {
-  const locationRequests = _.range(13).map(i => `/locations?bounds=0,-${i * 15}|90,${-1 * (i * 15 - 15)}`)
-  return Promise.all(locationRequests.map(lr => apiFetch(lr)))
+const buildRequests = route => _.range(13).map(i => `${route}?bounds=0,-${i * 15}|90,${-1 * (i * 15 - 15)}`)
+
+const fetchOnGrid = route => {
+  const requests = buildRequests(`${route}`)
+  return Promise.all(requests.map(r => apiFetch(r)))
     .then(results => [].concat(...results))
 }
 
@@ -48,37 +50,34 @@ const extractAirports = locations => {
   }
 }
 
-const initAirports = () => fetchLocations()
+const initAirports = () => fetchOnGrid('/locations')
   .then(extractAirports)
-  .then(airports => {
-    state.select('globe', 'airports').set(airports)
-  })
+  .then(airports => state.select('globe', 'airports').set(airports))
 
-const initPireps = () => apiFetch('/aircraft-reports/pireps')
+const initPireps = () => fetchOnGrid('/aircraft-reports/pireps')
   .then(pireps => state.select('globe', 'aircraftReports').set(pireps))
 
-const initAireps = () => apiFetch('/aircraft-reports/aireps?bounds=0,-180|90,1')
-  .then(aireps => _.uniqBy(aireps, a => a.aircraftRef))
-  .then(aireps => {
-    state.select('globe', 'aireps').set(aireps)
-  })
+const initAireps = () => fetchOnGrid('/aircraft-reports/aireps')
+  .then(aireps => state.select('globe', 'aireps').set(aireps))
 
 const initAircraft = () => {
-  return state.select('globe', 'aireps').get().map(airep => {
-    return flightAwareFetch(airep.aircraftRef)
-      .then(aircraftInfo => {
-        state.select('globe', 'aircraft').push(aircraftInfo)
-      })
-  })
+  const aireps = state.select('globe', 'aireps').get()
+  return Promise.resolve(_.uniqBy(aireps, a => a.aircraftRef))
+    .map(airep => airep.aircraftRef)
+    .then(aircraftRefs => {
+      return flightAwareFetch(aircraftRefs)
+        .then(aircraftInfo => {
+          // console.log(aircraftInfo)
+          state.select('globe', 'aircraft').set(aircraftInfo)
+        })
+    })
 }
 
-const initStations = () => apiFetch('/stations?bounds=0,-180|90,1')
+const initStations = () => fetchOnGrid('/stations')
   .then(stations => state.select('globe', 'stations').set(stations))
 
-const initSites = () => {
-  return apiFetch('/sites')
-    .then(sites => state.select('globe', 'sites').set(sites))
-}
+const initSites = () => fetchOnGrid('/sites')
+  .then(sites => state.select('globe', 'sites').set(sites))
 
 // const initNotams = () => apiFetch('/navaids')
 //   .then(navaids => state.select('globe', 'navaids').set(navaids))
@@ -113,12 +112,12 @@ const updateAircraftPositions = () => {
 
 const initState = () => {
   return Promise.map([
+    initAirports,
     () => initAireps().then(() => initAircraft()),
-    initPireps,
     initStations,
     initNotams,
     initSites,
-    initAirports
+    initPireps
   ], x => x(), { concurrency: 2 })
     .then(() => setInterval(updateAircraftPositions, 500))
 }
