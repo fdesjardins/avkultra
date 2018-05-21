@@ -1,12 +1,16 @@
-import Inferno from 'inferno'
+import React from 'react'
 
 import StateViewer from '-/components/StateViewer/StateViewer'
 import Globe from '-/components/Globe/Globe'
 
 import './App.scss'
 
-const App = ({ tree }) => (
-  <Globe tree={ tree.select('globe') } />
-)
+const App = () => {
+  return (
+    <div className="main">
+      <Globe/>
+    </div>
+  )
+}
 
 export default App

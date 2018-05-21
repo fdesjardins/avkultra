@@ -1,64 +1,89 @@
-const path = require('path')
-const webpack = require('webpack')
+const cesiumSource = "node_modules/cesium/Source";
+const cesiumWorkers = "../Build/Cesium/Workers";
+const path = require("path");
+const webpack = require("webpack");
+const CopywebpackPlugin = require("copy-webpack-plugin");
+const HTMLWebpackPlugin = require("html-webpack-plugin");
 
-const resolve = d => path.join(__dirname, d)
+const dev = process.env.NODE_ENV !== "production";
+
+const resolve = d => path.join(__dirname, d);
+
+const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
+  template: resolve("server/index.html"),
+  filename: "index.html",
+  inject: "body"
+});
 
 module.exports = {
-  entry: resolve('client/index'),
-  output: {
-    path: resolve('dist'),
-    filename: 'bundle.js',
-    sourcePrefix: ''
+  devServer: {
+    host: "localhost",
+    port: "3000",
+    hot: true,
+    headers: {
+      "Access-Control-Allow-Origin": "*"
+    },
+    historyApiFallback: true
   },
-  // devtool: 'cheap-module-source-map',
+  entry: ["react-hot-loader/patch", resolve("client/index.js")],
+  module: {
+    rules: [
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        loaders: ["babel-loader"]
+      },
+      {
+        test: /\.(css|scss)$/,
+        loader: "style-loader!css-loader!sass-loader"
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg|gltf)$/i,
+        loader: "url-loader",
+        options: {
+          limit: 10000
+        }
+      }
+    ]
+  },
   resolve: {
-    modules: ['node_modules'],
-    extensions: ['*', '.json', '.jsx', '.js'],
+    extensions: [".js", ".jsx"],
     alias: {
-      '-': resolve('client')
+      "-": resolve("client"),
+      cesium: resolve(cesiumSource)
     }
   },
-  module: {
-    loaders: [
-      {
-        test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
-        loaders: [
-          'babel-loader'
-        ]
-      },
-      {
-        test: /\.scss$/,
-        loaders: [
-          'style-loader',
-          'css-loader',
-          'sass-loader'
-        ]
-      },
-      {
-        test: /\.css$/,
-        loaders: [
-          'style-loader',
-          'css-loader'
-        ]
-      },
-      {
-        test: /\.(jpe?g|png|gif|svg)$/i,
-        loaders: [
-          'file-loader?hash=sha512&digest=hex&name=[hash].[ext]',
-          'image-webpack-loader?bypassOnDebug'
-        ]
-      },
-      {
-        test: /\.(gltf|glb)$/i,
-        loaders: [
-          'file-loader?hash=sha512&digest=hex&name=[hash].[ext]'
-        ]
-      }
-    ],
-    unknownContextCritical: false,
-    unknownContextRegExp: /^.\/.*$/
+  output: {
+    filename: "index.js",
+    path: resolve("dist"),
+    sourcePrefix: ""
   },
+  mode: dev ? "development" : "production",
   plugins: [
-  ]
-}
+    new webpack.DefinePlugin({
+      "process.env.NODE_ENV": dev
+        ? JSON.stringify("development")
+        : JSON.stringify("production")
+    }),
+    HTMLWebpackPluginConfig,
+    new webpack.HotModuleReplacementPlugin(),
+    new CopywebpackPlugin([
+      { from: path.join(cesiumSource, cesiumWorkers), to: "Workers" }
+    ]),
+    new CopywebpackPlugin([
+      { from: path.join(cesiumSource, "Assets"), to: "Assets" }
+    ]),
+    new CopywebpackPlugin([
+      { from: path.join(cesiumSource, "Widgets"), to: "Widgets" }
+    ]),
+    new webpack.DefinePlugin({
+      CESIUM_BASE_URL: JSON.stringify('')
+  })
+  ],
+  amd: {
+    toUrlUndefined: true
+  },
+  node: {
+    fs: "empty"
+  }
+};

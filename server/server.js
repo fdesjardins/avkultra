@@ -20,7 +20,7 @@ module.exports = async (config) => {
 
   const client = new catbox.Client(catboxRedis, {
     partition: `avku`,
-    host: '127.0.0.1',
+    host: process.env.REDIS_HOST || 'localhost',
     port: 6379,
     password: ''
   })

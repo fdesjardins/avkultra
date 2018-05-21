@@ -1,13 +1,11 @@
-## Installation
+# avkultra
 
-```
-npm install -g webpack
-npm install
-```
+Example aviation data application using Cesium
 
 ## Usage
 
 ```
+npm install
 cp ./config/secrets.{example.json,json}
 ```
 
@@ -15,7 +13,7 @@ Update `./config/secrets.json` with your keys, etc., then
 
 ```
 mkdir -p ./dist/cesium && cp -r ./node_modules/cesium/Build/Cesium/* ./dist/cesium
-webpack
+npx webpack
 node server/server.js
 ```
 

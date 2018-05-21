@@ -1,19 +1,21 @@
 import superagent from 'superagent'
 import jsonp from 'superagent-jsonp'
 import url from 'url'
-import config from '-/config'
+import config from '../config'
 
-exports.shouldUpdate = (lastProps, nextProps) => {
+console.log('config', config)
+
+export const shouldUpdate = (lastProps, nextProps) => {
   return JSON.stringify(lastProps) !== JSON.stringify(nextProps)
 }
 
-exports.apiFetch = route => {
+export const apiFetch = route => {
   return superagent.get(`${config.api.host}${route}`)
     .then(results => results.body.payload)
     .catch(err => console.error(err))
 }
 
-exports.flightAwareFetch = aircraftIds => {
+export const flightAwareFetch = aircraftIds => {
   return superagent.post(`${config.proxyApi.host}/aircraft`)
     .set('Content-Type', 'application/json')
     .send({ aircraft: aircraftIds })
@@ -21,7 +23,7 @@ exports.flightAwareFetch = aircraftIds => {
     .catch(err => console.error(err))
 }
 
-exports.notamsFetch = () => {
+export const notamsFetch = () => {
   return superagent.get(`${config.avkuApi.host}/notams`)
     .then(response => response.body)
     .catch(err => console.error(err))

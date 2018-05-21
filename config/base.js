@@ -5,7 +5,7 @@ const secrets = require('./secrets.json')
 const config = {}
 
 config.environments = Object.freeze({
-  local: 'local',
+  development: 'development',
   production: 'production'
 })
 

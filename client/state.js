@@ -5,7 +5,7 @@ import Promise from 'bluebird'
 
 import { apiFetch, flightAwareFetch, notamsFetch } from '-/utils'
 
-const state = new Baobab({
+const tree = new Baobab({
   meta: {
     name: 'avkultra'
   },
@@ -52,38 +52,38 @@ const extractAirports = locations => {
 
 const initAirports = () => fetchOnGrid('/locations')
   .then(extractAirports)
-  .then(airports => state.select('globe', 'airports').set(airports))
+  .then(airports => tree.select('globe', 'airports').set(airports))
 
 const initPireps = () => fetchOnGrid('/aircraft-reports/pireps')
-  .then(pireps => state.select('globe', 'aircraftReports').set(pireps))
+  .then(pireps => tree.select('globe', 'aircraftReports').set(pireps))
 
 const initAireps = () => fetchOnGrid('/aircraft-reports/aireps')
-  .then(aireps => state.select('globe', 'aireps').set(aireps))
+  .then(aireps => tree.select('globe', 'aireps').set(aireps))
 
 const initAircraft = () => {
-  const aireps = state.select('globe', 'aireps').get()
+  const aireps = tree.select('globe', 'aireps').get()
   return Promise.resolve(_.uniqBy(aireps, a => a.aircraftRef))
     .map(airep => airep.aircraftRef)
     .then(aircraftRefs => {
       return flightAwareFetch(aircraftRefs)
         .then(aircraftInfo => {
           // console.log(aircraftInfo)
-          state.select('globe', 'aircraft').set(aircraftInfo)
+          tree.select('globe', 'aircraft').set(aircraftInfo)
         })
     })
 }
 
 const initStations = () => fetchOnGrid('/stations')
-  .then(stations => state.select('globe', 'stations').set(stations))
+  .then(stations => tree.select('globe', 'stations').set(stations))
 
 const initSites = () => fetchOnGrid('/sites')
-  .then(sites => state.select('globe', 'sites').set(sites))
+  .then(sites => tree.select('globe', 'sites').set(sites))
 
 // const initNotams = () => apiFetch('/navaids')
 //   .then(navaids => state.select('globe', 'navaids').set(navaids))
 
 const initNotams = () => notamsFetch('kzdv')
-  .then(notams => state.select('globe', 'notams').set(notams))
+  .then(notams => tree.select('globe', 'notams').set(notams))
 
 // https://stackoverflow.com/a/19356304/3011062
 const calculateNewPosition = (lat, long, bearing, distance) => {
@@ -94,7 +94,7 @@ const calculateNewPosition = (lat, long, bearing, distance) => {
 }
 
 const updateAircraftPositions = () => {
-  const aircraftCursor = state.select('globe', 'aircraft')
+  const aircraftCursor = tree.select('globe', 'aircraft')
   const updatedAircraft = aircraftCursor.get().map(aircraft => {
     const newPosition = calculateNewPosition(
       aircraft.lowLatitude,
@@ -110,18 +110,18 @@ const updateAircraftPositions = () => {
   aircraftCursor.set(updatedAircraft)
 }
 
-const initState = () => {
-  return Promise.map([
-    initAirports,
-    () => initAireps().then(() => initAircraft()),
-    initStations,
-    initNotams,
-    initSites,
-    initPireps
-  ], x => x(), { concurrency: 2 })
-    .then(() => setInterval(updateAircraftPositions, 500))
-}
+// const initState = () => {
+//   return Promise.map([
+//     initAirports,
+//     // () => initAireps().then(() => initAircraft()),
+//     // initStations,
+//     // initNotams,
+//     // initSites,
+//     // initPireps
+//   ], x => x(), { concurrency: 2 })
+//     .then(() => setInterval(updateAircraftPositions, 500))
+// }
 
-initState()
+// initState()
 
-export default state
+export default tree

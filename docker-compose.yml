@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+
+  redis:
+    image: redis:4-alpine
+    restart: always
+    expose:
+      - 6379
+
+  avkultra:
+    build: .
+    restart: always
+    command: sh -c "./node_modules/.bin/webpack && npm start"
+    depends_on:
+      - redis
+    volumes:
+      - .:/usr/app
+      - /usr/app/node_modules
+    environment:
+      REDIS_HOST: redis
+    ports:
+      - "1357:1357"

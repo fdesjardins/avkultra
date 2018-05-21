@@ -2,26 +2,26 @@ const _ = require('lodash')
 
 const baseConfig = require('./base')
 
-exports.local = _.merge({}, baseConfig, {
+exports.development = _.merge({}, baseConfig, {
   api: {
-    host: 'http://104.198.183.44/v2'
+    host: 'https://avcamsapi.faa.gov'
   },
   avkuApi: {
-    host: 'http://localhost:1357'
+    host: process.env.API_URI
   },
   proxyApi: {
-    host: 'http://localhost:1358'
+    host: process.env.PROXY_API_URI
   }
 })
 
 exports.production = _.merge({}, baseConfig, {
   api: {
-    host: 'http://104.198.183.44/v2'
+    host: 'https://avcamsapi.faa.gov'
   },
   avkuApi: {
-    host: 'http://138.68.50.91:1357'
+    host: process.env.API_URI
   },
   proxyApi: {
-    host: 'http://138.68.50.91:1358'
+    host: process.env.PROXY_API_URI
   }
 })

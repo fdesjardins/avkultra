@@ -1,78 +1,137 @@
 {
   "name": "avkultra",
   "version": "0.0.0",
-  "description": "",
-  "main": "index.js",
-  "repository": "fdesjardins/avkultra",
   "author": {
     "name": "Forrest Desjardins",
     "email": "desjardinsfg@gmail.com",
     "url": "github.com/fdesjardins"
   },
+  "babel": {
+    "presets": [
+      "react",
+      [
+        "env",
+        {
+          "modules": false
+        }
+      ]
+    ],
+    "plugins": [
+      "react-hot-loader/babel",
+      "babel-plugin-transform-object-rest-spread"
+    ],
+    "env": {
+      "test": {
+        "presets": [
+          "react",
+          [
+            "env",
+            {
+              "modules": "commonjs"
+            }
+          ]
+        ],
+        "plugins": [
+          "transform-es2015-modules-commonjs"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "baobab": "^2.5.2",
+    "baobab-react": "^3.0.0",
+    "body-parser": "^1.18.3",
+    "catbox": "^10.0.2",
+    "catbox-redis": "^4.1.0",
+    "cesium": "^1.45.0",
+    "cesium-react": "^0.2.1",
+    "compression": "^1.7.2",
+    "cors": "^2.8.4",
+    "css2json": "0.0.4",
+    "express": "^4.16.3",
+    "json-markup": "^1.1.0",
+    "lodash": "^4.17.10",
+    "notams": "^1.1.9",
+    "react": "^16.3.2",
+    "react-dom": "^16.3.2",
+    "redis": "^2.8.0",
+    "stream": "0.0.2",
+    "superagent": "^3.8.3",
+    "superagent-jsonp": "^0.2.1",
+    "url": "^0.11.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-plugin-inferno": "^5.0.1",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "chai": "^4.1.2",
+    "copy-webpack-plugin": "^4.5.1",
+    "coveralls": "^3.0.1",
+    "css-loader": "^0.28.11",
+    "eslint": "^4.19.1",
+    "file-loader": "^1.1.11",
+    "html-webpack-plugin": "^3.2.0",
+    "image-webpack-loader": "^4.2.0",
+    "livereload": "^0.7.0",
+    "mocha": "^5.2.0",
+    "node-sass": "^4.9.0",
+    "nyc": "^11.8.0",
+    "react-hot-loader": "^4.2.0",
+    "require-dir": "^1.0.0",
+    "sass-loader": "^7.0.1",
+    "standard": "^11.0.1",
+    "style-loader": "^0.21.0",
+    "url-loader": "^1.0.1",
+    "webpack": "^4.8.3",
+    "webpack-cli": "^2.1.3",
+    "webpack-dev-server": "^3.1.4"
+  },
   "engines": {
     "node": ">=7"
   },
-  "scripts": {
-    "start": "nodemon server/server.js -w server",
-    "test": "eslint *.js && nyc ./node_modules/.bin/mocha --opts mocha.opts test.js"
+  "eslintConfig": {
+    "extends": [
+      "standard"
+    ],
+    "rules": {
+      "object-curly-spacing": [
+        2,
+        "always"
+      ],
+      "array-bracket-spacing": [
+        2,
+        "always"
+      ],
+      "func-style": [
+        2,
+        "expression"
+      ],
+      "prefer-arrow-callback": [
+        2,
+        {
+          "allowNamedFunctions": false
+        }
+      ]
+    }
   },
   "files": [
     "index.js"
   ],
   "keywords": [],
   "license": "MIT",
-  "dependencies": {
-    "body-parser": "^1.18.2",
-    "catbox": "^10.0.2",
-    "catbox-redis": "^4.0.0",
-    "cesium": "^1.41.0",
-    "compression": "^1.7.1",
-    "cors": "^2.8.4",
-    "css2json": "0.0.4",
-    "express": "^4.16.2",
-    "inferno": "^3.10.1",
-    "inferno-router": "^3.10.1",
-    "json-markup": "^1.1.0",
-    "lodash": "^4.17.4",
-    "notams": "^1.1.8",
-    "redis": "^2.8.0",
-    "stream": "0.0.2",
-    "superagent": "^3.8.2",
-    "superagent-jsonp": "^0.2.0",
-    "url": "^0.11.0",
-    "webpack": "^3.10.0"
-  },
-  "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.2",
-    "babel-plugin-inferno": "^3.4.0",
-    "babel-preset-babili": "^0.1.4",
-    "babel-preset-env": "^1.6.1",
-    "baobab": "^2.5.0",
-    "chai": "^4.1.2",
-    "coveralls": "^3.0.0",
-    "css-loader": "^0.28.9",
-    "eslint": "^4.16.0",
-    "eslint-config-standard": "^11.0.0-beta.0",
-    "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-node": "^5.2.1",
-    "eslint-plugin-promise": "^3.6.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "file-loader": "^1.1.6",
-    "image-webpack-loader": "^4.0.0",
-    "livereload": "^0.6.3",
-    "mocha": "^5.0.0",
-    "node-sass": "^4.7.2",
-    "nyc": "^11.4.1",
-    "require-dir": "^0.3.2",
-    "sass-loader": "^6.0.6",
-    "style-loader": "^0.20.1",
-    "webpack": "^3.10.0"
-  },
+  "main": "index.js",
   "nyc": {
     "reporter": [
       "lcov",
       "text"
     ]
+  },
+  "repository": "fdesjardins/avkultra",
+  "scripts": {
+    "build": "webpack -p",
+    "start": "webpack-dev-server -d",
+    "test": "eslint *.js && nyc ./node_modules/.bin/mocha --opts mocha.opts test.js"
   }
 }

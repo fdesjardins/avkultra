@@ -1,13 +1,11 @@
 import Baobab from 'baobab'
-import Inferno from 'inferno'
+import React from 'react'
+import { render } from 'react-dom'
+import { root } from 'baobab-react/higher-order'
 
 import App from '-/components/App/App'
-import initialState from '-/state'
+import tree from '-/state'
 
-const initialize = (tree, App) => {
-  const render = () => Inferno.render(<App tree={ tree }/>, document.querySelector('#app'))
-  tree.on('update', render)
-  render()
-}
+const RootedApp = root(tree, App)
 
-initialize(initialState, App)
+render(<RootedApp/> , document.querySelector('#app'))
