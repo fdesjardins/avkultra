@@ -31,11 +31,13 @@ import ArcGisMapServerImageryProvider from 'cesium/Scene/ArcGisMapServerImageryP
 import UrlTemplateImageryProvider from 'cesium/Scene/UrlTemplateImageryProvider'
 
 import utils from '-/utils'
+import { registerViewer } from '-/actions/actions'
 import { bingMapsApiKey } from '-/config'
 
 import './Globe.scss'
 import sr71 from '-/assets/sr71.png'
 import b739 from '-/assets/B739.gltf'
+import { getAirports } from '../../actions/actions';
 
 let cesiumViewerOptions = {
   animation: false,
@@ -92,35 +94,14 @@ const mapPirepIntensityToColor = intensity => {
   return Color.BLUE
 }
 
-const didMount = (
-  { airports }
-  // aircraftReportsCursor,
-  // stationsCursor,
-  // sitesCursor,
-  // navaidsCursor,
-  // aircraftCursor,
-  // airepsCursor,
-  // notamsCursor
-) => {
-  const viewer = new cesium.Viewer('cesium-container', cesiumViewerOptions)
-  // viewer.scene.imageryLayers.addImageryProvider(new UrlTemplateImageryProvider({
-  //   url : 'http://104.197.62.138/map-tiles/vfr/sectional?bbox={westDegrees},{southDegrees},{eastDegrees},{northDegrees}'
-  // }))
-  // viewer.scene.imageryLayers.addImageryProvider(new UrlTemplateImageryProvider({
-  //   url : 'http://104.197.62.138/map-tiles/vfr/terminal-area?bbox={westDegrees},{southDegrees},{eastDegrees},{northDegrees}'
-  // }))
-  const cesiumTerrainProviderMeshes = new CesiumTerrainProvider({
-    url: '//assets.agi.com/stk-terrain/world',
-    requestWaterMask: true,
-    requestVertexNormals: true
-  })
-  viewer.terrainProvider = cesiumTerrainProviderMeshes
-
-  console.log('airports', airports)
-
-  if (!airports) {
-    return
+const AirportsLayer = branch({ airports: ['globe', 'airports'] }, ({ viewer, airports }) => {
+  console.log('here')
+  if (!airports || airports.length === 0) {
+    console.log('no airports')
+    getAirports()
+    return false
   }
+  console.log('render')
   airports.map(airport => {
     viewer.entities.add({
       name: `${airport.icaoAirportName} (${airport.icaoIdentifier}) Airport`,
@@ -144,7 +125,21 @@ const didMount = (
       }
     })
   })
-}
+  return <div className="airports-layer"></div>
+})
+
+// const didMount = (
+//   { airports }
+//   // aircraftReportsCursor,
+//   // stationsCursor,
+//   // sitesCursor,
+//   // navaidsCursor,
+//   // aircraftCursor,
+//   // airepsCursor,
+//   // notamsCursor
+// ) => {
+
+// }
   
   // aircraftReportsCursor.on('update', () => {
   //   aircraftReportsCursor.get().map(aircraftReport => {
@@ -327,22 +322,44 @@ const didMount = (
   // })
 // }
 
+const DataLayers = ({ viewer }) => {
+  return (
+    <AirportsLayer viewer={ viewer } />
+  )
+}
+
 class Globe extends React.Component {
   constructor(props) {
     super(props)
+    this.state = {
+      viewer: null
+    }
   }
   componentDidMount () {
-    didMount({
-      airports: this.props.airports
+    const viewer = new cesium.Viewer('cesium-container', cesiumViewerOptions)
+    viewer.terrainProvider = new CesiumTerrainProvider({
+      url: '//assets.agi.com/stk-terrain/world',
+      requestWaterMask: true,
+      requestVertexNormals: true
+    })
+    // viewer.scene.imageryLayers.addImageryProvider(new UrlTemplateImageryProvider({
+    //   url : 'http://104.197.62.138/map-tiles/vfr/sectional?bbox={westDegrees},{southDegrees},{eastDegrees},{northDegrees}'
+    // }))
+    // viewer.scene.imageryLayers.addImageryProvider(new UrlTemplateImageryProvider({
+    //   url : 'http://104.197.62.138/map-tiles/vfr/terminal-area?bbox={westDegrees},{southDegrees},{eastDegrees},{northDegrees}'
+    // }))
+    
+    this.setState({
+      viewer
     })
   }
   render () { 
     return (
-      <div id='cesium-container' className='cesium-container'></div>
+      <div id='cesium-container' className='cesium-container'>
+        { this.state.viewer ? <DataLayers viewer={ this.state.viewer }/> : null }
+      </div>
     )
   }
 }
 
-export default branch({
-  airports: ['airports']
-}, Globe)
+export default Globe

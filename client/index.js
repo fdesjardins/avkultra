@@ -1,3 +1,4 @@
+import 'babel-polyfill'
 import Baobab from 'baobab'
 import React from 'react'
 import { render } from 'react-dom'

@@ -4,6 +4,7 @@ import _ from 'lodash'
 import Promise from 'bluebird'
 
 import { apiFetch, flightAwareFetch, notamsFetch } from '-/utils'
+import { getAirports } from '-/actions/actions'
 
 const tree = new Baobab({
   meta: {
@@ -20,39 +21,6 @@ const tree = new Baobab({
     aircraft: []
   }
 })
-
-const buildRequests = route => _.range(13).map(i => `${route}?bounds=0,-${i * 15}|90,${-1 * (i * 15 - 15)}`)
-
-const fetchOnGrid = route => {
-  const requests = buildRequests(`${route}`)
-  return Promise.all(requests.map(r => apiFetch(r)))
-    .then(results => [].concat(...results))
-}
-
-const extractAirports = locations => {
-  if (locations && locations.length > 0) {
-    return _.flatten(locations.map(a => {
-      if (a && a.data && a.data.length > 0) {
-        let visibility = 1
-        if (a.display && a.display.length > 0) {
-          const lowest = a.display.find(d => d.markerStyle === 'FULL')
-          if (lowest && lowest.level) {
-            visibility = 13 - lowest.level
-          }
-        }
-        return a.data.map(d => {
-          if (d.type === 'airport') {
-            return _.merge({}, d, { visibility: Math.pow(visibility, 3.5) })
-          }
-        })
-      }
-    })).filter(x => !!x)
-  }
-}
-
-const initAirports = () => fetchOnGrid('/locations')
-  .then(extractAirports)
-  .then(airports => tree.select('globe', 'airports').set(airports))
 
 const initPireps = () => fetchOnGrid('/aircraft-reports/pireps')
   .then(pireps => tree.select('globe', 'aircraftReports').set(pireps))
@@ -110,17 +78,17 @@ const updateAircraftPositions = () => {
   aircraftCursor.set(updatedAircraft)
 }
 
-// const initState = () => {
-//   return Promise.map([
-//     initAirports,
-//     // () => initAireps().then(() => initAircraft()),
-//     // initStations,
-//     // initNotams,
-//     // initSites,
-//     // initPireps
-//   ], x => x(), { concurrency: 2 })
-//     .then(() => setInterval(updateAircraftPositions, 500))
-// }
+const initState = () => {
+  getAirports()
+
+    // () => initAireps().then(() => initAircraft()),
+    // initStations,
+    // initNotams,
+    // initSites,
+    // initPireps
+  // ], x => x(), { concurrency: 2 })
+    // .then(() => setInterval(updateAircraftPositions, 500))
+}
 
 // initState()
 
