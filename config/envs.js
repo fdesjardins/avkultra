@@ -4,7 +4,7 @@ const baseConfig = require('./base')
 
 exports.development = _.merge({}, baseConfig, {
   api: {
-    host: 'https://avcamsapi.faa.gov'
+    host: 'http://localhost:34100'
   },
   avkuApi: {
     host: process.env.API_URI
@@ -16,7 +16,7 @@ exports.development = _.merge({}, baseConfig, {
 
 exports.production = _.merge({}, baseConfig, {
   api: {
-    host: 'https://avcamsapi.faa.gov'
+    host: 'http://192.168.0.112:34100'
   },
   avkuApi: {
     host: process.env.API_URI
